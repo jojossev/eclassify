@@ -76,9 +76,10 @@ export default function Footer() {
               <CustomImage
                 src={settings?.footer_logo}
                 alt="eClassify"
-                width={195}
-                height={52}
-                className="w-full h-[52px] object-contain ltr:object-left rtl:object-right max-w-[195px]"
+                width={10}
+                height={10}
+                className="w-full object-contain ltr:object-left rtl:object-right"  
+                style={{ maxWidth: "140px" }}
               />
             </CustomLink>
             <p className="text-gray-300 text-sm max-w-md">

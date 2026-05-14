@@ -43,8 +43,8 @@ export const generateMetadata = async ({ searchParams }) => {
   }
 };
 
-const AboutUsPage = () => {
-  return <AnimatedApropos breadcrumbTitleKey="aboutUs" />;
+const AproposPage = () => {
+  return <AnimatedApropos breadcrumbTitleKey="apropos" />;
 };
 
-export default AboutUsPage;
+export default AproposPage;

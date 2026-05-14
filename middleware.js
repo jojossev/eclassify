@@ -42,6 +42,7 @@ export const config = {
     matcher: [
         '/',
         '/about-us',
+        '/apropos',
         '/ad-details/:slug*',
         '/ad-listing',
         '/ads',

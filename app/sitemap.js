@@ -33,6 +33,7 @@ export default async function sitemap() {
 
   const publicRoutes = [
     "about-us",
+    "apropos",
     "ads",
     "blogs",
     "contact-us",

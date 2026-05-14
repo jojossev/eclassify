@@ -1,5 +1,6 @@
 import { logoutSuccess } from "@/redux/reducer/authSlice";
 import { setIsUnauthorized } from "@/redux/reducer/globalStateSlice";
+import { getPublicApiBase } from "@/lib/publicApiBase";
 import { store } from "@/redux/store";
 import axios from "axios";
 
@@ -8,13 +9,31 @@ const getLangFromUrl = () => {
   return params.get("lang") || undefined;
 };
 
+const apiBase = getPublicApiBase();
 const Api = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}`,
+  ...(apiBase ? { baseURL: apiBase } : {}),
 });
 
 let isUnauthorizedToastShown = false;
+let missingApiBaseWarned = false;
 
 Api.interceptors.request.use(function (config) {
+  if (!getPublicApiBase()) {
+    if (typeof window !== "undefined" && !missingApiBaseWarned) {
+      missingApiBaseWarned = true;
+      console.warn(
+        "[eClassify] NEXT_PUBLIC_API_URL and NEXT_PUBLIC_END_POINT are not set; API requests are skipped. Add them to .env.local."
+      );
+    }
+    return Promise.reject(
+      new axios.AxiosError(
+        "API base URL not configured",
+        "ERR_NOT_CONFIGURED",
+        config
+      )
+    );
+  }
+
   let token = undefined;
   let langCode = process.env.NEXT_PUBLIC_DEFAULT_LANG_CODE;
 

@@ -662,5 +662,10 @@
   "selectRenewalPackage": "Select a renewal package",
   "selectRenewalPackageError": "Please select a renewal package",
   "freeAdListingEnabled": "Free Ad Listing Enabled",
-  "postFreeOfCost": "You can post ads free of cost without any subscription plan."
+  "postFreeOfCost": "You can post ads free of cost without any subscription plan.",
+  "apropos": "À propos",
+  "aboutFallbackTagline": "Buy, sell, and connect through a modern classifieds marketplace.",
+  "aboutFallbackP1": "{name} helps you publish listings with photos and location, explore categories, and reach buyers and sellers in your area.",
+  "aboutFallbackP2": "Search and filters, favorites, real-time chat, featured ads and subscriptions, job applications, blogs, and reviews are built in so you can run your marketplace end to end.",
+  "aboutFallbackAdminHint": "Site owners can replace this text with custom HTML from the admin system settings (About us)."
 }

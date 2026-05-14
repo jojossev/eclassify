@@ -2,14 +2,17 @@ import Layout from "@/components/Layout/Layout";
 import StructuredData from "@/components/Layout/StructuredData";
 import Home from "@/components/PagesComponent/Home/Home";
 import { SEO_REVALIDATE_SECONDS } from "@/lib/constants";
+import { getPublicApiBase } from "@/lib/publicApiBase";
 
 export const generateMetadata = async ({ searchParams }) => {
   if (process.env.NEXT_PUBLIC_SEO === "false") return;
+  const apiBase = getPublicApiBase();
+  if (!apiBase) return null;
   const langCode = (await searchParams)?.lang;
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}seo-settings?page=home`,
+      `${apiBase}seo-settings?page=home`,
       {
         headers: {
           "Content-Language": langCode || "en",
@@ -41,9 +44,11 @@ export const generateMetadata = async ({ searchParams }) => {
 
 const fetchCategories = async (langCode) => {
   if (process.env.NEXT_PUBLIC_SEO === "false") return [];
+  const apiBase = getPublicApiBase();
+  if (!apiBase) return [];
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-categories?page=1`,
+      `${apiBase}get-categories?page=1`,
       {
         headers: {
           "Content-Language": langCode || "en",
@@ -63,9 +68,11 @@ const fetchCategories = async (langCode) => {
 
 const fetchProductItems = async (langCode) => {
   if (process.env.NEXT_PUBLIC_SEO === "false") return [];
+  const apiBase = getPublicApiBase();
+  if (!apiBase) return [];
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-item?page=1`,
+      `${apiBase}get-item?page=1`,
       {
         headers: {
           "Content-Language": langCode || "en",
@@ -85,9 +92,11 @@ const fetchProductItems = async (langCode) => {
 
 const fetchFeaturedSections = async (langCode) => {
   if (process.env.NEXT_PUBLIC_SEO === "false") return [];
+  const apiBase = getPublicApiBase();
+  if (!apiBase) return [];
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_END_POINT}get-featured-section`,
+      `${apiBase}get-featured-section`,
       {
         headers: {
           "Content-Language": langCode || "en",

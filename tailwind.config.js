@@ -97,12 +97,28 @@ module.exports = {
             opacity: 0,
           },
         },
+        "apropos-fade-up": {
+          "0%": { opacity: "0", transform: "translateY(1.5rem)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "apropos-float": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(12px, -28px) scale(1.04)" },
+          "66%": { transform: "translate(-18px, 16px) scale(0.98)" },
+        },
+        "apropos-gradient": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "collapsible-down": "collapsible-down 0.3s ease-in-out",
         "collapsible-up": "collapsible-up 0.3s ease-in-out",
+        "apropos-fade-up": "apropos-fade-up 0.85s ease-out forwards",
+        "apropos-float": "apropos-float 20s ease-in-out infinite",
+        "apropos-gradient": "apropos-gradient 14s ease infinite",
       },
     },
     screens: {

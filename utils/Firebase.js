@@ -6,32 +6,73 @@ import {
   onMessage,
   isSupported,
 } from "firebase/messaging";
-import firebase from "firebase/compat/app";
 import { getAuth } from "firebase/auth";
 import { toast } from "sonner";
 import { createStickyNote, t } from ".";
 import { getFcmToken } from "@/redux/reducer/settingSlice";
 
-const FirebaseData = () => {
-  let firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
-  };
+const noop = () => Promise.resolve();
+const noopUnsubscribe = () => {};
 
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+let missingFirebaseConfigWarned = false;
+
+const buildFirebaseConfig = () => ({
+  apiKey: process.env.NEXT_PUBLIC_API_KEY?.trim(),
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN?.trim(),
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID?.trim(),
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET?.trim(),
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID?.trim(),
+  appId: process.env.NEXT_PUBLIC_APP_ID?.trim(),
+  measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID?.trim(),
+});
+
+const isFirebaseWebConfigUsable = (config) =>
+  Boolean(
+    config.apiKey &&
+      config.projectId &&
+      config.appId &&
+      config.apiKey.length > 10
+  );
+
+const FirebaseData = () => {
+  const firebaseConfig = buildFirebaseConfig();
+
+  if (!isFirebaseWebConfigUsable(firebaseConfig)) {
+    if (typeof window !== "undefined" && !missingFirebaseConfigWarned) {
+      missingFirebaseConfigWarned = true;
+      console.warn(
+        "[eClassify] Firebase env vars are missing or incomplete; push notifications and Firebase auth are disabled. Set NEXT_PUBLIC_API_KEY, NEXT_PUBLIC_PROJECT_ID, NEXT_PUBLIC_APP_ID, etc."
+      );
+    }
+    return {
+      firebase: null,
+      authentication: null,
+      fetchToken: async () => {},
+      onMessageListener: async () => noopUnsubscribe,
+      signOut: noop,
+    };
   }
 
-  const app = initializeApp(firebaseConfig);
-  const authentication = getAuth(app);
-  const firebaseApp = !getApps().length
-    ? initializeApp(firebaseConfig)
-    : getApp();
+  let firebaseApp;
+  let authentication;
+  try {
+    firebaseApp = !getApps().length
+      ? initializeApp(firebaseConfig)
+      : getApp();
+    authentication = getAuth(firebaseApp);
+  } catch (err) {
+    if (typeof window !== "undefined" && !missingFirebaseConfigWarned) {
+      missingFirebaseConfigWarned = true;
+      console.warn("[eClassify] Firebase initialization failed:", err?.message || err);
+    }
+    return {
+      firebase: null,
+      authentication: null,
+      fetchToken: async () => {},
+      onMessageListener: async () => noopUnsubscribe,
+      signOut: noop,
+    };
+  }
 
   const messagingInstance = async () => {
     try {
@@ -47,6 +88,7 @@ const FirebaseData = () => {
       return null;
     }
   };
+
   const fetchToken = async (setFcmToken) => {
     try {
       if (typeof window !== "undefined" && "serviceWorker" in navigator) {
@@ -71,8 +113,7 @@ const FirebaseData = () => {
             })
             .catch((err) => {
               console.error("Error retrieving token:", err);
-              // If the error is "no active Service Worker", try to register the service worker again
-              if (err.message.includes("no active Service Worker")) {
+              if (err.message?.includes?.("no active Service Worker")) {
                 registerServiceWorker();
               }
             });
@@ -94,8 +135,7 @@ const FirebaseData = () => {
             "Service Worker registration successful with scope: ",
             registration.scope
           );
-          // After successful registration, try to fetch the token again
-          fetchToken();
+          fetchToken(() => {});
         })
         .catch((err) => {
           console.log("Service Worker registration failed: ", err);
@@ -112,10 +152,16 @@ const FirebaseData = () => {
       return null;
     }
   };
-  const signOut = () => {
-    return authentication.signOut();
+
+  const signOut = () => authentication.signOut();
+
+  return {
+    firebase: null,
+    authentication,
+    fetchToken,
+    onMessageListener,
+    signOut,
   };
-  return { firebase, authentication, fetchToken, onMessageListener, signOut };
 };
 
 export default FirebaseData;
